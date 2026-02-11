@@ -162,30 +162,6 @@ After registration, users are assigned one of three roles:
 2. **Sponsor**: Can create scholarships and review applications
 3. **Admin**: Can verify student applications and forward to sponsors
 
-## Project Structure
-
-```
-PBL/
-├── backend/
-│   ├── config/          # Database configuration
-│   ├── controllers/     # Request handlers
-│   ├── middleware/      # Auth, upload, error handling
-│   ├── models/          # MongoDB schemas
-│   ├── routes/          # API routes
-│   ├── server.js        # Express server
-│   └── package.json
-│
-└── frontend/
-    ├── src/
-    │   ├── components/  # Reusable components
-    │   ├── contexts/    # React contexts (Auth)
-    │   ├── hooks/       # Custom hooks
-    │   ├── lib/         # API service layer
-    │   ├── pages/       # Page components
-    │   └── App.tsx      # Main app component
-    └── package.json
-```
-
 ## Testing the Application
 
 1. **Register as a Student**:
