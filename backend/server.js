@@ -18,13 +18,19 @@ const app = express();
 connectDB();
 
 // Middleware
+const allowedOrigins = [
+    'http://localhost:8080',
+    'http://localhost:8081',
+    'http://localhost:5173',
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(u => u.trim()) : [])
+];
 app.use(cors({
-    origin: [
-        'http://localhost:8080',
-        'http://localhost:8081',
-        'http://localhost:5173',
-        process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, Postman)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true
 }));
 app.use(express.json());
@@ -57,16 +63,18 @@ app.use((req, res) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
-// Start server
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+// Start server only when running locally (not in Vercel serverless)
+if (process.env.NODE_ENV !== 'production' || process.env.LOCAL_DEV === 'true') {
+    const PORT = process.env.PORT || 5000;
+    const server = app.listen(PORT, () => {
+        console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-    console.log(`Error: ${err.message}`);
-    server.close(() => process.exit(1));
-});
+    // Handle unhandled promise rejections
+    process.on('unhandledRejection', (err) => {
+        console.log(`Error: ${err.message}`);
+        server.close(() => process.exit(1));
+    });
+}
 
 module.exports = app;
