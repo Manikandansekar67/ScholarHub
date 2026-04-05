@@ -16,9 +16,9 @@ router.get('/', getAllScholarships);
 router.get('/:id', getScholarship);
 
 // Protected routes
-router.get('/my/created', authenticate, authorize('sponsor'), getMySponsoredScholarships);
-router.post('/', authenticate, authorize('sponsor'), createScholarship);
-router.put('/:id', authenticate, authorize('sponsor'), updateScholarship);
-router.delete('/:id', authenticate, authorize('sponsor'), deleteScholarship);
+router.get('/my/created', authenticate, authorize('sponsor', 'admin'), getMySponsoredScholarships);
+router.post('/', authenticate, authorize('sponsor', 'admin'), createScholarship);
+router.put('/:id', authenticate, authorize('sponsor', 'admin'), updateScholarship);
+router.delete('/:id', authenticate, authorize('sponsor', 'admin'), deleteScholarship);
 
 module.exports = router;
