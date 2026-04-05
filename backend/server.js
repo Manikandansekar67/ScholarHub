@@ -17,22 +17,27 @@ const app = express();
 // Connect to database
 connectDB();
 
-// Middleware
-const allowedOrigins = [
-    'http://localhost:8080',
-    'http://localhost:8081',
-    'http://localhost:5173',
-    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(u => u.trim()) : [])
-];
-app.use(cors({
+// CORS — allow all Vercel preview URLs, production URL, and localhost
+const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. mobile apps, Postman)
+        // Allow requests with no origin (Postman, mobile, server-to-server)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
+        // Allow all vercel.app deployments (previews + production)
+        if (origin.endsWith('.vercel.app')) return callback(null, true);
+        // Allow localhost for local dev
+        if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) return callback(null, true);
+        // Allow explicit FRONTEND_URL if set
+        const allowed = (process.env.FRONTEND_URL || '').split(',').map(u => u.trim()).filter(Boolean);
+        if (allowed.includes(origin)) return callback(null, true);
         callback(new Error(`CORS: origin ${origin} not allowed`));
     },
-    credentials: true
-}));
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
+// Handle OPTIONS preflight for all routes
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
