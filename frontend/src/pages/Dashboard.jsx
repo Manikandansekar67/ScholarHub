@@ -59,8 +59,12 @@ const Dashboard = () => {
     data: applicationsResponse,
     isLoading: isLoadingApps
   } = useQuery({
-    queryKey: ["myApplications"],
-    queryFn: () => applicationAPI.getMyApplications(),
+    queryKey: ["myApplications", user?.role],
+    queryFn: () => {
+      if (user?.role === "sponsor") return applicationAPI.getForSponsor();
+      if (user?.role === "admin") return applicationAPI.getForAdmin();
+      return applicationAPI.getMyApplications();
+    },
     enabled: !!user
   });
   const {
