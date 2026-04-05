@@ -107,8 +107,8 @@ exports.updateScholarship = async (req, res, next) => {
             });
         }
 
-        // Make sure user is scholarship sponsor
-        if (scholarship.sponsor.toString() !== req.user._id.toString()) {
+        // Make sure user is scholarship sponsor or admin
+        if (scholarship.sponsor.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
                 message: 'Not authorized to update this scholarship'
@@ -147,8 +147,8 @@ exports.deleteScholarship = async (req, res, next) => {
             });
         }
 
-        // Make sure user is scholarship sponsor
-        if (scholarship.sponsor.toString() !== req.user._id.toString()) {
+        // Make sure user is scholarship sponsor or admin
+        if (scholarship.sponsor.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
                 message: 'Not authorized to delete this scholarship'
@@ -173,10 +173,11 @@ exports.deleteScholarship = async (req, res, next) => {
 // @access  Private (Sponsor only)
 exports.getMySponsoredScholarships = async (req, res, next) => {
     try {
-        const scholarships = await Scholarship.find({
+        const query = req.user.role === 'admin' ? { isActive: true } : {
             sponsor: req.user._id,
             isActive: true
-        }).sort({ createdAt: -1 });
+        };
+        const scholarships = await Scholarship.find(query).sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
