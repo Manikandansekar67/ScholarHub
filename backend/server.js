@@ -43,6 +43,23 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// Root route
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'ScholarHub API is running',
+        version: '1.0.0',
+        endpoints: {
+            health: '/api/health',
+            auth: '/api/auth',
+            scholarships: '/api/scholarships',
+            applications: '/api/applications',
+            documents: '/api/documents',
+            notifications: '/api/notifications'
+        }
+    });
+});
+
 // Health check route
 app.get('/api/health', (req, res) => {
     res.status(200).json({
